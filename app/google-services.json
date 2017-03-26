@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "281747385726",
+    "project_id": "firebase-dementia"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:281747385726:android:d07e120705ad0762",
+        "android_client_info": {
+          "package_name": "hackemory.dementiaapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "281747385726-skif8jab22enl67agnkdt9e5jpcrntmk.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "hackemory.dementiaapp",
+            "certificate_hash": "7b462abcf19d12c7c0e952285b86d0f39cb71e7a"
+          }
+        },
+        {
+          "client_id": "281747385726-n9oq00vh0pa7sj57tmuocatg5te6jpa9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDZGokWYCc0FNxm7A7L6BLpez_oCcH-zq4"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
