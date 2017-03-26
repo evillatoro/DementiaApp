@@ -38,6 +38,7 @@ dependencies {
     compile('com.google.apis:google-api-services-gmail:v1-rev62-1.22.0') {
         exclude group: 'org.apache.httpcomponents'
     }
+    compile 'com.google.android.gms:play-services-gcm:10.2.1'
 }
 
 
