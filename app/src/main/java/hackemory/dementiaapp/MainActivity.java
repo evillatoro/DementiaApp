@@ -24,7 +24,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.NotificationCompat;
-import android.text.TextUtils;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
@@ -54,6 +53,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -102,15 +103,15 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 //        activityLayout.setLayoutParams(lp);
 //        activityLayout.setOrientation(LinearLayout.VERTICAL);
 //        activityLayout.setPadding(16, 16, 16, 16);
-
+        con = this.getApplicationContext();
         longitude = (TextView) findViewById(R.id.textView1);
         latitude = (TextView) findViewById(R.id.textView);
         inLocation = (TextView) findViewById(R.id.textView2);
         nearLocation = (TextView) findViewById(R.id.textView3);
         didTask = (TextView) findViewById(R.id.textView4);
-        nearLocation.setText("near location : false");
-        didTask.setText("shopping complete : false");
-        inLocation.setText("in small box: false");
+//        nearLocation.setText("near location : false");
+//        didTask.setText("shopping complete : false");
+//        inLocation.setText("in small box: false");
 
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         Criteria criteria = new Criteria();
@@ -129,14 +130,10 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
             if (location != null)
                 onLocationChanged(location);
-            else
-                Toast.makeText(getBaseContext(), "No Location Provider Found Check Your Code",
-                        Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getBaseContext(), "No Location Provider Found Check Your Code",
+                        //Toast.LENGTH_SHORT).show();
         }
 
-
-
-        con = this.getApplicationContext();
 
 //        ViewGroup.LayoutParams tlp = new ViewGroup.LayoutParams(
 //                ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -149,7 +146,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
             public void onClick(View v) {
                 mCallApiButton.setEnabled(false);
                 mOutputText.setText("");
-                getResultsFromApi();
+                //getResultsFromApi();
                 mCallApiButton.setEnabled(true);
             }
         });
@@ -183,13 +180,13 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                     //Getting the registration token from the intent
                     String token = intent.getStringExtra("token");
                     //Displaying the token as toast
-                    Toast.makeText(getApplicationContext(), "Registration token:" + token, Toast.LENGTH_LONG).show();
+                    //Toast.makeText(getApplicationContext(), "Registration token:" + token, Toast.LENGTH_LONG).show();
 
                     //if the intent is not with success then displaying error messages
                 } else if(intent.getAction().equals(GCMRegistrationIntentService.REGISTRATION_ERROR)){
-                    Toast.makeText(getApplicationContext(), "GCM registration error!", Toast.LENGTH_LONG).show();
+                    //Toast.makeText(getApplicationContext(), "GCM registration error!", Toast.LENGTH_LONG).show();
                 } else {
-                    Toast.makeText(getApplicationContext(), "Error occurred", Toast.LENGTH_LONG).show();
+                    //Toast.makeText(getApplicationContext(), "Error occurred", Toast.LENGTH_LONG).show();
                 }
             }
         };
@@ -217,6 +214,8 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
             Intent itent = new Intent(this, GCMRegistrationIntentService.class);
             startService(itent);
         }
+
+        getResultsFromApi();
     }
 
     //Registering receiver on activity resume
@@ -522,10 +521,12 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                     String subject = mreader.getSubject();
                     if(librayNotfication) {
                         labels.add(subject);
+                        labels.add(subject);
                     }
 
                     if(subject.contains("bill")) {
                         String dueDate = getDueDate(mreader.getText());
+                        labels.add(subject);
                         labels.add(dueDate);
                         //labels.add(mreader.getSubject());
                     }
@@ -573,32 +574,55 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
         @Override
         protected void onPreExecute() {
-            mOutputText.setText("");
-            mProgress.show();
+//            mOutputText.setText("");
+           // mProgress.show();
         }
 
         @Override
         protected void onPostExecute(List<String> output) {
             mProgress.hide();
             if (output == null || output.size() == 0) {
-                mOutputText.setText("No results returned.");
+                //mOutputText.setText("No results returned.");
             } else {
                 //output.add(0, "Data retrieved using the Gmail API:");
-                mOutputText.setText(TextUtils.join("\n", output));
+                //mOutputText.setText(TextUtils.join("\n", output));
                 int id = 0;
-                for (String message: output) {
+                for(int i = 0; i < output.size(); i+=2) {
+                    String message = output.get(i);
+                    String message2 = output.get(i +1);
                     NotificationCompat.Builder mBuilder =
                             (NotificationCompat.Builder) new NotificationCompat.Builder(con)
                                     .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark)
-                                    .setContentTitle("Notification " + (id + 1))
-                                    .setContentText(message);
+                                    .setContentTitle(message)
+                                    .setContentText(message2);
 
                     NotificationManager mNotificationManager =
                             (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
                     mNotificationManager.notify(id,mBuilder.build());
                     id++;
                 }
+                new Timer().schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        // this code will be executed after 2 seconds
+                        getResultsFromApi();
+                    }
+                }, 10000);
+//                for (String message: output) {
+//                    NotificationCompat.Builder mBuilder =
+//                            (NotificationCompat.Builder) new NotificationCompat.Builder(con)
+//                                    .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark)
+//                                    .setContentTitle("Notification " + (id + 1))
+//                                    .setContentText(message);
+//
+//                    NotificationManager mNotificationManager =
+//                            (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+//                    mNotificationManager.notify(id,mBuilder.build());
+//                    id++;
+//                }
             }
+
+
         }
 
         @Override
@@ -719,30 +743,42 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         int id = 10;
         double lat = location.getLatitude();
         double lon = location.getLongitude();
-        longitude.setText("Longitude:" + location.getLongitude());
-        latitude.setText("Latitude:" + location.getLatitude());
+        //longitude.setText("Longitude:" + location.getLongitude());
+        //latitude.setText("Latitude:" + location.getLatitude());
 
         String message = "";
         if(!shopped) {
             if (((lat > 33.789260) && (lat < 33.789894)) && ((lon > -84.327046) && (lon < -84.326246))) {
-                nearLocation.setText("near location : true");
-                inLocation.setText("in small box: false");
+               //nearLocation.setText("near location : true");
+               // inLocation.setText("in small box: false");
                 message = "store is near, go shopping";
+                if(!storeisneargoshopping) {
+                    NotificationCompat.Builder mBuilder =
+                            (NotificationCompat.Builder) new NotificationCompat.Builder(con)
+                                    .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark)
+                                    .setContentTitle("Shopping Reminder")
+                                    .setContentText(message);
+
+                    NotificationManager mNotificationManager =
+                            (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                    mNotificationManager.notify(id, mBuilder.build());
+                    storeisneargoshopping = true;
+                }
                 if (((lat > 33.789515) && (lat < 33.789679)) && ((lon > -84.326657) && (lon < -84.326392))) {
-                    nearLocation.setText("near location : true");
-                    inLocation.setText("in small box: true");
+                    //nearLocation.setText("near location : true");
+                    //inLocation.setText("in small box: true");
                     if (startTime == 0) {
                         startTime = System.currentTimeMillis();
                     } else {
                         difference = (System.currentTimeMillis() - startTime) / 1000;
                         if (difference > 10) {
-                            didTask.setText("shopping complete : true");
+                            //didTask.setText("shopping complete : true");
                             message = "finished shopping, head home";
                             if(!finishedShoppingHeadHome) {
                                 NotificationCompat.Builder mBuilder =
                                         (NotificationCompat.Builder) new NotificationCompat.Builder(con)
                                                 .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark)
-                                                .setContentTitle("Notification " + (id + 1))
+                                                .setContentTitle("Shopping Reminder")
                                                 .setContentText(message);
 
                                 NotificationManager mNotificationManager =
@@ -755,23 +791,23 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                         }
                     }
                 } else {
-                    inLocation.setText("in small box: false");
+                    //inLocation.setText("in small box: false");
                     startTime = 0;
                 }
             } else {
-                nearLocation.setText("near location : false");
+                //nearLocation.setText("near location : false");
             }
         } else {
             difference = (System.currentTimeMillis() - startTime) / 1000;
             if (difference > 60) {
                 shopped = false;
-                didTask.setText("shopping complete : false");
+                //didTask.setText("shopping complete : false");
                 message = "time to go shopping";
                 if(!timeToGoShopping) {
                     NotificationCompat.Builder mBuilder =
                             (NotificationCompat.Builder) new NotificationCompat.Builder(con)
                                     .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark)
-                                    .setContentTitle("Notification " + (id + 1))
+                                    .setContentTitle("Shopping Reminder")
                                     .setContentText(message);
 
                     NotificationManager mNotificationManager =
@@ -790,7 +826,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                     NotificationCompat.Builder mBuilder =
                             (NotificationCompat.Builder) new NotificationCompat.Builder(con)
                                     .setSmallIcon(R.drawable.common_google_signin_btn_icon_dark)
-                                    .setContentTitle("Notification " + (id + 1))
+                                    .setContentTitle("Shopping Reminder")
                                     .setContentText(message);
 
                     NotificationManager mNotificationManager =
